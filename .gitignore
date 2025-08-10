@@ -1,0 +1,4 @@
+.env
+bin
+.obj
+obj/Debug/net9.0/

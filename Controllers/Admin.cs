@@ -1,0 +1,1 @@
+namespace ThoamAuth.Routes.Admin;
