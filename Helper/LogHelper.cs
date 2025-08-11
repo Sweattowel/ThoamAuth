@@ -3,7 +3,7 @@ using ThoamAuth.Models.Logs;
 
 namespace ThoamAuth.Helpers.Logs;
 
-public class LogHelper
+public class LogHelperClass
 {
     public static ConcurrentBag<Models.Logs.Logs> LogList = new ConcurrentBag<Models.Logs.Logs> { };
 

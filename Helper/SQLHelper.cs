@@ -6,7 +6,7 @@ using ThoamAuth.Models.User;
 using System.Data;
 namespace ThoamAuth.Helpers.SQL;
 
-public class SQL
+public class SQLHelperClass
 {
     private static string GetConnectionString()
     {
@@ -57,7 +57,7 @@ public class SQL
         DateTime LastLoginData = reader.GetDateTime(reader.GetOrdinal("LastLoginData"));
         int LoginCount = reader.GetInt32(reader.GetOrdinal("LoginCount"));
 
-        if (Encryption.Encryption.Verify(PassWordAttempt, StoredAccountHash, StoredAccountSalt))
+        if (EncryptionHelperClass.Verify(PassWordAttempt, StoredAccountHash, StoredAccountSalt))
         {
             return new UserModelClass.User()
             {
@@ -95,7 +95,7 @@ public class SQL
         }
 
 
-        string[] PassAndSalt = Encryption.Encryption.GenNewHash(PassWordAttempt);
+        string[] PassAndSalt = EncryptionHelperClass.GenNewHash(PassWordAttempt);
 
         await using (var commandEnter = new SqlCommand(SQLqueryEnter, connection))
         {
@@ -131,11 +131,30 @@ public class SQL
                 NotificationID = reader.GetInt32(reader.GetOrdinal("@NotificationID")),
                 RelevantUserID = reader.GetInt32(reader.GetOrdinal("@RelevantUserID")),
                 NotificationMessage = reader.GetString(reader.GetOrdinal("@NotificationMessage")),
-                NotificationState = (ThoamAuth.Models.Notifications.NotificationState)reader.GetInt32(reader.GetOrdinal("@NotificationState")),
+                NotificationState = (Models.Notifications.NotificationState)reader.GetInt32(reader.GetOrdinal("@NotificationState")),
                 NotificationCreatedDate = reader.GetDateTime(reader.GetOrdinal("@NotificationCreatedDate"))
             });
         }
 
         return notifications;
+    }
+    public static async Task<bool> UpdateNotificationSql(int UserID, Models.Notifications.NotificationState NotificationStateAttempt)
+    {
+        string SQLQuery = "UPDATE Notifications SET NotificationState = @NotificationStateAttempt WHERE RelevantUserID = @UserIDAttempt";
+
+        using var connection = new SqlConnection(connectionString.ConnectionString);
+
+        await connection.OpenAsync();
+
+        using var command = new SqlCommand(SQLQuery, connection);
+
+        command.Parameters.Add("@NotificationStateAttempt", SqlDbType.Int).Value = (int)NotificationStateAttempt;
+        command.Parameters.Add("@UserIDAttempt", SqlDbType.Int).Value = UserID;
+
+        var Count = await command.ExecuteNonQueryAsync();
+
+        await connection.CloseAsync();
+
+        return Count == 1;
     }
 }

@@ -1,14 +1,15 @@
 using System.Threading.Tasks;
-using ThoamAuth.Routes.User;
+using ThoamAuth.Controllers.User;
+using ThoamAuth.Helpers.SQL;
+using ThoamAuth.Models;
 
 namespace ThoamAuth.Helpers.Notifications;
 
-public class Notifications
+public class NotificationsHelperClass
 {
     public static async Task CreateNotification(string notificationText, Models.Notifications.NotificationLevel Level, int RelevantUserID)
     {
-        if (notificationText == "") { return; }
-        ;
+        if (notificationText == "") { return; };
 
         var newNotification = new Models.Notifications.Notifications
         {
@@ -28,7 +29,7 @@ public class Notifications
     }
     public async static Task<Models.Notifications.Notifications[]> RetrieveNotifications(int UserID)
     {
-        List<Models.Notifications.Notifications> UserNotifications = await SQL.SQL.GetNotifications(UserID);
+        List<Models.Notifications.Notifications> UserNotifications = await SQLHelperClass.GetNotifications(UserID);
 
         foreach (var Noti in UserNotifications)
         {

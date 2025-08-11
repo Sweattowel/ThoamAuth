@@ -1,1 +1,1 @@
-namespace ThoamAuth.Routes.Admin;
+namespace ThoamAuth.Controllers.Admin;

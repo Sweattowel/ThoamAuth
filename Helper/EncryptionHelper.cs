@@ -3,7 +3,7 @@ using System.Text;
 
 namespace ThoamAuth.Helpers.Encryption;
 
-public class Encryption
+public class EncryptionHelperClass
 {
     public static string[] GenNewHash(string HashAttempt)
     {
@@ -45,7 +45,8 @@ public class Encryption
 
         if (!CryptographicOperations.FixedTimeEquals(attemptBytes, encryptBytes))
         {
-            Logs.LogHelper.GenerateLog("Failed to Verify User", Models.Logs.LogStateEnum.Warning, 0);
+            Logs.LogHelperClass.GenerateLog("Failed to Verify User", Models.Logs.LogStateEnum.Warning, 0);
+
             return false;
         }
         return true;

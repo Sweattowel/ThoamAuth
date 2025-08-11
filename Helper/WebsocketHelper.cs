@@ -4,7 +4,7 @@ using System.Text.Unicode;
 using Microsoft.AspNetCore.Mvc;
 using ThoamAuth.Models.User;
 
-namespace ThoamAuth.Routes.WebSockets;
+namespace ThoamAuth.Helpers.WebSockets;
 
 public class WebSocketService : IAsyncDisposable
 {

@@ -2,10 +2,12 @@ using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using ThoamAuth.Helpers.Logs;
 using ThoamAuth.Helpers.SQL;
+using ThoamAuth.Helpers.Notifications;
 using ThoamAuth.Models.User;
 using ThoamAuth.Models.RequestForms;
-using ThoamAuth.Routes.WebSockets;
-namespace ThoamAuth.Routes.User;
+using ThoamAuth.Helpers.WebSockets;
+
+namespace ThoamAuth.Controllers.User;
 
 [ApiController]
 [Route("/UserAuthorization")]
@@ -17,7 +19,8 @@ public class UserRoutes : ControllerBase
     {
         UserModelClass.User? VerifiedUser = await SQL.SQLLoginCheck(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
 
-        if (VerifiedUser == null) { return Unauthorized(); };
+        if (VerifiedUser == null) { return Unauthorized(); }
+        ;
 
         UserListManipulation.RegisterAndHoldUser(VerifiedUser);
         LogHelper.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, 1);
@@ -32,7 +35,8 @@ public class UserRoutes : ControllerBase
         {
             var Login = await LogIn(UserForm);
             return Login;
-        };
+        }
+        ;
 
         return Unauthorized();
     }
@@ -42,6 +46,13 @@ public class UserRoutes : ControllerBase
         var Notifications = Helpers.Notifications.Notifications.RetrieveNotifications(UserID);
 
         return Notifications;
+    }
+    [HttpPatch("UpdateNotification")]
+    public async Task<IActionResult> UpdateNotification([FromBody] int UserID, int NotificationID, Models.Notifications.NotificationLevel IntendedLevel)
+    {
+        bool Success = await ThoamAuth.Helpers.SQL.SQL.UpdateNotificationSql(UserID, NotificationID, IntendedLevel);
+
+        return Success ? Ok() : Conflict();
     }
 }
 public class UserListManipulation
@@ -63,7 +74,7 @@ public class UserListManipulation
 
             ActiveUsers.TryRemove(UserData.UserID, out _);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine(ex);
             throw;
