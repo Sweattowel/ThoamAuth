@@ -138,9 +138,9 @@ public class SQLHelperClass
 
         return notifications;
     }
-    public static async Task<bool> UpdateNotificationSql(int UserID, Models.Notifications.NotificationState NotificationStateAttempt)
+    public static async Task<bool> UpdateNotificationSql(int UserID, int NotificationID, Models.Notifications.NotificationState NotificationStateAttempt)
     {
-        string SQLQuery = "UPDATE Notifications SET NotificationState = @NotificationStateAttempt WHERE RelevantUserID = @UserIDAttempt";
+        string SQLQuery = "UPDATE Notifications SET NotificationState = @NotificationStateAttempt WHERE RelevantUserID = @UserIDAttempt AND NotificationID = @NotificationIDAttempt";
 
         using var connection = new SqlConnection(connectionString.ConnectionString);
 
@@ -148,8 +148,9 @@ public class SQLHelperClass
 
         using var command = new SqlCommand(SQLQuery, connection);
 
-        command.Parameters.Add("@NotificationStateAttempt", SqlDbType.Int).Value = (int)NotificationStateAttempt;
         command.Parameters.Add("@UserIDAttempt", SqlDbType.Int).Value = UserID;
+        command.Parameters.Add("@NotificationIDAttempt", SqlDbType.Int).Value = NotificationID;
+        command.Parameters.Add("@NotificationStateAttempt", SqlDbType.Int).Value = (int)NotificationStateAttempt;
 
         var Count = await command.ExecuteNonQueryAsync();
 

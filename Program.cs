@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using ThoamAuth.ServerPoliciesAndSettings.Roles;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -11,13 +15,32 @@ builder.Services.AddHttpsRedirection(Options =>
     Options.HttpsPort = 5001;
 });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("User", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("User");
+        policy.Requirements.Add(new RoleClass.NotRoleRequirement("Admin"));
+    })
+    .AddPolicy("Admin", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("AdminUser");
+        policy.Requirements.Add(new RoleClass.NotRoleRequirement("User"));
+    });
+
+builder.Services.AddSingleton<IAuthorizationHandler, RoleClass.NotRoleHandler>();
+
 var app = builder.Build();
 
 app.UseSwagger();
+
 app.UseSwaggerUI();
 
 
 app.UseWebSockets();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

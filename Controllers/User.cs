@@ -17,20 +17,20 @@ public class UserRoutes : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> LogIn([FromBody] UserFormData UserForm)
     {
-        UserModelClass.User? VerifiedUser = await SQL.SQLLoginCheck(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
+        UserModelClass.User? VerifiedUser = await SQLHelperClass.SQLLoginCheck(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
 
         if (VerifiedUser == null) { return Unauthorized(); }
         ;
 
         UserListManipulation.RegisterAndHoldUser(VerifiedUser);
-        LogHelper.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, 1);
+        LogHelperClass.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, 1);
         return Ok();
     }
 
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] UserFormData UserForm)
     {
-        var VerifiedUser = await SQL.RegisterUser(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
+        var VerifiedUser = await SQLHelperClass.RegisterUser(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
         if (VerifiedUser)
         {
             var Login = await LogIn(UserForm);
@@ -43,14 +43,14 @@ public class UserRoutes : ControllerBase
     [HttpGet("GetNotifications")]
     public Task<Models.Notifications.Notifications[]> GetMyNotifications([FromQuery] int UserID)
     {
-        var Notifications = Helpers.Notifications.Notifications.RetrieveNotifications(UserID);
+        var Notifications = NotificationsHelperClass.RetrieveNotifications(UserID);
 
         return Notifications;
     }
     [HttpPatch("UpdateNotification")]
-    public async Task<IActionResult> UpdateNotification([FromBody] int UserID, int NotificationID, Models.Notifications.NotificationLevel IntendedLevel)
+    public async Task<IActionResult> UpdateNotification([FromBody] int UserID, int NotificationID, Models.Notifications.NotificationState IntendedState)
     {
-        bool Success = await ThoamAuth.Helpers.SQL.SQL.UpdateNotificationSql(UserID, NotificationID, IntendedLevel);
+        bool Success = await SQLHelperClass.UpdateNotificationSql(UserID, NotificationID, IntendedState);
 
         return Success ? Ok() : Conflict();
     }
