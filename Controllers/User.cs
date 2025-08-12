@@ -23,7 +23,7 @@ public class UserRoutes : ControllerBase
         ;
 
         UserListManipulation.RegisterAndHoldUser(VerifiedUser);
-        LogHelperClass.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, 1);
+        LogHelperClass.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, Models.Logs.LogImportance.Low);
         return Ok();
     }
 

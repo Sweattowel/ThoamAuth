@@ -45,7 +45,7 @@ public class EncryptionHelperClass
 
         if (!CryptographicOperations.FixedTimeEquals(attemptBytes, encryptBytes))
         {
-            Logs.LogHelperClass.GenerateLog("Failed to Verify User", Models.Logs.LogStateEnum.Warning, 0);
+            Logs.LogHelperClass.GenerateLog("Failed to Verify User", Models.Logs.LogStateEnum.Warning, Models.Logs.LogImportance.Low);
 
             return false;
         }

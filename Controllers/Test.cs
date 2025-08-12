@@ -1,8 +1,11 @@
 using ThoamAuth.Models.User;
 using ThoamAuth.Helpers.WebSockets;
+using ThoamAuth.Helpers.Logs;
 using Microsoft.AspNetCore.Mvc;
+using ThoamAuth.Models.Logs;
 
 namespace ThoamAuth.Controllers.Testing;
+
 [ApiController]
 [Route("/ServerTesting")]
 public class Testing : ControllerBase
@@ -14,7 +17,7 @@ public class Testing : ControllerBase
         UserSalt = "",
         State = UserModelClass.UserState.Inactive,
         LastLoginData = null,
-        LoginCount = 0,   
+        LoginCount = 0,
     };
 
     [HttpGet("TestWebSocket")]
@@ -25,7 +28,7 @@ public class Testing : ControllerBase
         await ws.ConnectAsync(TestUser);
 
         await ws.SendMessageAndAwaitAsync($"Ping 1: {DateTime.Now}");
-        
+
         await ws.SendMessageAndAwaitAsync($"Ping 2: {DateTime.Now}");
 
         await ws.SendMessageAndAwaitAsync($"Ping 3: {DateTime.Now}");
@@ -35,5 +38,10 @@ public class Testing : ControllerBase
         await ws.DisposeAsync();
 
         return Ok();
+    }
+    [HttpGet("TestGetLogs")]
+    public Logs[] GetLogs()
+    {
+        return [.. LogHelperClass.LogList];
     }
 }

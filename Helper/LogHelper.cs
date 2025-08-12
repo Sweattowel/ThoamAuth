@@ -7,7 +7,7 @@ public class LogHelperClass
 {
     public static ConcurrentBag<Models.Logs.Logs> LogList = new ConcurrentBag<Models.Logs.Logs> { };
 
-    public static void GenerateLog(string LogMessage, Models.Logs.LogStateEnum LogState, int LogLevel)
+    public static void GenerateLog(string LogMessage, Models.Logs.LogStateEnum LogState, Models.Logs.LogImportance LogLevel)
     {
         Models.Logs.Logs newLog = new Models.Logs.Logs()
         {
@@ -15,18 +15,18 @@ public class LogHelperClass
             LogMessage = LogMessage,
             LogTime = DateTime.Now,
             LogState = LogState,
-            LogLevel = LogLevel
+            LogImportance = LogLevel
         };
         LogList.Add(newLog);
     }
-    public static Models.Logs.Logs[] GetLogs(LogFilterData FilterType, Models.Logs.LogStateEnum ?WantedLogState, int ?WantedLevel)
+    public static Models.Logs.Logs[] GetLogs(LogFilterData FilterType, Models.Logs.LogStateEnum ?WantedLogState, LogImportance ?WantedLevel)
     {
         List<Models.Logs.Logs> FilteredLogList = new List<Models.Logs.Logs>();
         
         switch (FilterType)
         {
             case LogFilterData.Level: return [.. LogList.Where(L => L.LogState == WantedLogState)];
-            case LogFilterData.State: return [.. LogList.Where(L => L.LogLevel == WantedLevel)];
+            case LogFilterData.State: return [.. LogList.Where(L => L.LogImportance == WantedLevel)];
             default: return [];
         };
     }

@@ -7,6 +7,12 @@ public enum LogStateEnum
     Critical,
     StartUp
 }
+public enum LogImportance
+{
+    Low,
+    Medium,
+    High
+}
 public enum LogFilterData
 {
     State,
@@ -18,5 +24,5 @@ public class Logs
     public required string LogMessage { get; set; }
     public DateTime LogTime { get; set; }
     public LogStateEnum LogState { get; set; }
-    public int LogLevel { get; set; }
+    public LogImportance LogImportance { get; set; }
 }

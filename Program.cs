@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using ThoamAuth.ServerPoliciesAndSettings.Roles;
+using ThoamAuth.ServerPoliciesAndSettings.MiddleWare;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ app.UseSwagger();
 
 app.UseSwaggerUI();
 
+app.UseMiddleware<RequestMiddleware>();
 
 app.UseWebSockets();
 
