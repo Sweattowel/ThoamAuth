@@ -45,7 +45,8 @@ public class SQLHelperClass
 
         await using var reader = command.ExecuteReader();
 
-        if (!reader.Read()) { return null; };
+        if (!reader.Read()) { return null; }
+        ;
 
         var StoredAccountHash = reader.GetString(reader.GetOrdinal("UserPassword"));
         var StoredAccountSalt = reader.GetString(reader.GetOrdinal("UserSalt"));
@@ -157,5 +158,67 @@ public class SQLHelperClass
         await connection.CloseAsync();
 
         return Count == 1;
+    }
+    public static async Task<bool> CreateNotificationSQL(Models.Notifications.Notifications notification)
+    {
+        string SQLquery = "INSERT INTO Notifications (RelevantUserID, NotificationMessage, NotificationState, NotificationLevel, NotificationCreatedDate) VALUES (@RelevantUserIDAttempt, @NotificationMessageAttempt, @NotificationStateAttempt, @NotificationLevelAttempt, @NotificationCreatedDateAttempt)";
+
+        using var connection = new SqlConnection(connectionString.ConnectionString);
+
+        await connection.OpenAsync();
+
+        using var command = new SqlCommand(SQLquery, connection);
+
+        command.Parameters.Add("@RelevantUserIDAttempt", SqlDbType.Int).Value = notification.RelevantUserID;
+        command.Parameters.Add("@NotificationMessageAttempt", SqlDbType.Text).Value = notification.NotificationMessage;
+        command.Parameters.Add("@NotificationStateAttempt", SqlDbType.Int).Value = (int)notification.NotificationState;
+        command.Parameters.Add("@NotificationLevelAttempt", SqlDbType.Int).Value = (int)notification.NotificationLevel;
+        command.Parameters.Add("@NotificationCreatedDateAttempt", SqlDbType.Int).Value = notification.NotificationCreatedDate;
+
+        var Count = await command.ExecuteNonQueryAsync();
+
+        await connection.CloseAsync();
+
+        return Count == 1;
+    }
+    public static async Task<UserModelClass.User?> SQLAdminLogin(Models.RequestForms.AdminFormData adminFormData)
+    {
+        string SQLquery = "SELECT * FROM AdminList WHERE UserName = @UserNameAttempt";
+
+        using var connection = new SqlConnection(connectionString.ConnectionString);
+
+        await connection.OpenAsync();
+
+        using var command = new SqlCommand(SQLquery, connection);
+
+        command.Parameters.Add("@UserNameAttempt", SqlDbType.Text).Value = adminFormData.UserNameAttempt;
+
+        await using var reader = command.ExecuteReader();
+
+        var UserID = reader.GetInt32(reader.GetOrdinal("UserID"));
+        var UserName = reader.GetString(reader.GetOrdinal("UserName"));
+        var UserPassword = reader.GetString(reader.GetOrdinal("UserPassword"));
+        var UserSalt = reader.GetString(reader.GetOrdinal("UserSalt"));
+        var State = reader.GetInt32(reader.GetOrdinal("State"));
+        var LastLoginData = reader.GetDateTime(reader.GetOrdinal("LastLoginData"));
+        var LoginCount = reader.GetInt32(reader.GetOrdinal("LoginCount"));
+
+        await connection.CloseAsync();
+
+        bool VerifiedPassword = Encryption.EncryptionHelperClass.Verify(adminFormData.PasswordAttempt, UserPassword, UserSalt);
+
+        if (!VerifiedPassword) { return null; };
+
+        UserModelClass.User CurrAdmin = new()
+        {
+            UserID = UserID,
+            UserName = UserName,
+            UserSalt = UserSalt,
+            State = (UserModelClass.UserState)State,
+            LastLoginData = LastLoginData,
+            LoginCount = LoginCount
+        };
+        
+        return CurrAdmin;
     }
 }

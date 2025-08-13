@@ -6,6 +6,8 @@ using ThoamAuth.Helpers.Notifications;
 using ThoamAuth.Models.User;
 using ThoamAuth.Models.RequestForms;
 using ThoamAuth.Helpers.WebSockets;
+using ThoamAuth.ServerPoliciesAndSettings.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ThoamAuth.Controllers.User;
 
@@ -17,29 +19,43 @@ public class UserRoutes : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> LogIn([FromBody] UserFormData UserForm)
     {
-        UserModelClass.User? VerifiedUser = await SQLHelperClass.SQLLoginCheck(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
+        UserModelClass.User? VerifiedUser = await SQLHelperClass.SQLLoginCheck(UserForm.UserNameAttempt, UserForm.PasswordAttempt);
 
-        if (VerifiedUser == null) { return Unauthorized(); }
-        ;
+        if (VerifiedUser == null) { return Unauthorized(); };
 
         UserListManipulation.RegisterAndHoldUser(VerifiedUser);
-        LogHelperClass.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, Models.Logs.LogImportance.Low);
-        return Ok();
-    }
 
+        LogHelperClass.GenerateLog("User Log in", Models.Logs.LogStateEnum.Info, Models.Logs.LogImportance.Low);
+
+        bool SignSuccess = await AuthorizationHelperClass.SignUserIn(HttpContext , VerifiedUser);
+
+        return SignSuccess ? Ok() : Unauthorized();
+    }
+    [Authorize(Roles = "User")]
+    [HttpPost("Logout")]
+    public async Task<IActionResult> LogOut([FromBody] UserFormData UserForm)
+    {
+        UserModelClass.User? VerifiedUser = await SQLHelperClass.SQLLoginCheck(UserForm.UserNameAttempt, UserForm.PasswordAttempt);
+
+        if (VerifiedUser == null) { return Unauthorized(); };
+
+        bool LogOutSuccess = await AuthorizationHelperClass.SignUserOut(HttpContext, VerifiedUser);
+
+        return LogOutSuccess ? Ok() : Unauthorized();
+    }
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] UserFormData UserForm)
     {
-        var VerifiedUser = await SQLHelperClass.RegisterUser(UserForm.UserNameAttempt, UserForm.PasswordNameAttempt);
+        var VerifiedUser = await SQLHelperClass.RegisterUser(UserForm.UserNameAttempt, UserForm.PasswordAttempt);
         if (VerifiedUser)
         {
             var Login = await LogIn(UserForm);
             return Login;
-        }
-        ;
+        };
 
         return Unauthorized();
     }
+    [Authorize(Roles = "User")]
     [HttpGet("GetNotifications")]
     public Task<Models.Notifications.Notifications[]> GetMyNotifications([FromQuery] int UserID)
     {
@@ -47,6 +63,7 @@ public class UserRoutes : ControllerBase
 
         return Notifications;
     }
+    [Authorize(Roles = "User")]
     [HttpPatch("UpdateNotification")]
     public async Task<IActionResult> UpdateNotification([FromBody] int UserID, int NotificationID, Models.Notifications.NotificationState IntendedState)
     {

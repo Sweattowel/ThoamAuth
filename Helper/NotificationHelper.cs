@@ -17,15 +17,10 @@ public class NotificationsHelperClass
             NotificationMessage = notificationText,
             NotificationState = Models.Notifications.NotificationState.New,
             NotificationLevel = Level,
-            NotificationCreatedDate = DateTime.Now
+            NotificationCreatedDate = DateTime.UtcNow
         };
 
-        //EnterNotification();
-
-        if (UserListManipulation.ActiveUsers.TryGetValue(RelevantUserID, out var activeUser))
-        {
-            await activeUser.WS.SendMessageAndAwaitAsync("New Notification");
-        }
+        await SQLHelperClass.CreateNotificationSQL(newNotification);
     }
     public async static Task<Models.Notifications.Notifications[]> RetrieveNotifications(int UserID)
     {

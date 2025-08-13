@@ -1,16 +1,15 @@
 using ThoamAuth.Models.User;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ThoamAuth.ServerPoliciesAndSettings.Authorization;
 
 public class AuthorizationHelperClass
 {
-    public static string GenerateTokenUser(UserModelClass.User UserData)
+    public static async Task<bool> SignUserIn(HttpContext httpContext, UserModelClass.User UserData)
     {
-        ClaimsIdentity claimsIdentity = new ClaimsIdentity();
+        ClaimsIdentity claimsIdentity = new ClaimsIdentity([], CookieAuthenticationDefaults.AuthenticationScheme);
 
         claimsIdentity.AddClaims([
             new Claim(ClaimTypes.Role, "User"),
@@ -18,22 +17,60 @@ public class AuthorizationHelperClass
             new Claim("UserID", UserData.UserID.ToString()),
             new Claim("UserName", UserData.UserName.ToString()),
             new Claim("LoginCount", UserData.LoginCount.ToString()),
-            new Claim("DateMinted", DateTime.Now.ToString())
+            new Claim("DateMinted", DateTime.UtcNow.ToString("o"))
         ]);
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Key"));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var TokenDescriptor = new SecurityTokenDescriptor
+        var authProperties = new AuthenticationProperties
         {
-            Subject = claimsIdentity,
-            Expires = DateTime.Now.AddHours(1),
-            SigningCredentials = creds
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(2)
         };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(TokenDescriptor);
+        await httpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties
+        );
 
-        return tokenHandler.WriteToken(token);
+        return true;
+    }
+    public static async Task<bool> SignUserOut(HttpContext httpContext, UserModelClass.User UserData)
+    {
+        await httpContext.SignOutAsync();
+
+        return true;
+    }
+    public static async Task<bool> SignAdminIn(HttpContext httpContext, UserModelClass.User UserData)
+    {
+        ClaimsIdentity claimsIdentity = new ClaimsIdentity([], CookieAuthenticationDefaults.AuthenticationScheme);
+
+        claimsIdentity.AddClaims([
+            new Claim(ClaimTypes.Role, "Admin"),
+
+            new Claim("AdminID", UserData.UserID.ToString()),
+            new Claim("AdminName", UserData.UserName.ToString()),
+            new Claim("LoginCount", UserData.LoginCount.ToString()),
+            new Claim("DateMinted", DateTime.UtcNow.ToString("o"))
+        ]);
+
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = false,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(2)
+        };
+
+        await httpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties
+        );
+
+        return true;
+    }
+    public static async Task<bool> SignAdminOut(HttpContext httpContext, UserModelClass.User UserData)
+    {
+        await httpContext.SignOutAsync();
+
+        return true;
     }
 }

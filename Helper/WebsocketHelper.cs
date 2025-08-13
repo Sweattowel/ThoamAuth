@@ -59,6 +59,9 @@ public class WebSocketService : IAsyncDisposable
             Console.WriteLine("Closing connection");
             await _websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing WebSocket", CancellationToken.None);
         }
+
+        GC.SuppressFinalize(_websocket);
+
         _websocket.Dispose();
     }
 }

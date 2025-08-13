@@ -17,6 +17,10 @@ public class RoleClass
             {
                 if (context.User.IsInRole(role))
                 {
+                    AuthorizationFailureReason reason = new(this, "Incorrect Roles");
+                    
+                    context.Fail(reason);
+
                     return Task.CompletedTask;
                 }
             }

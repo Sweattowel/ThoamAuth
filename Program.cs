@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using ThoamAuth.ServerPoliciesAndSettings.Roles;
 using ThoamAuth.ServerPoliciesAndSettings.MiddleWare;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,15 @@ builder.Services.AddHttpsRedirection(Options =>
 {
     Options.HttpsPort = 5001;
 });
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.AccessDeniedPath = "/Denied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
+        options.SlidingExpiration = true;
+    });
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("User", policy =>
@@ -31,6 +42,10 @@ builder.Services.AddAuthorizationBuilder()
     });
 
 builder.Services.AddSingleton<IAuthorizationHandler, RoleClass.NotRoleHandler>();
+
+builder.Services.AddAuthentication();
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
