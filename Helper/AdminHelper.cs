@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using System.Windows.Markup;
 using ThoamAuth.Helpers.Encryption;
 
@@ -5,14 +6,29 @@ namespace ThoamAuth.Helpers.AdminHelper;
 
 public class AdminHelperClass
 {
-    private static readonly string[] SecretCode = CreateSecretCode(Console.ReadLine());
+    private static string[]? SecretCode;
+    public static void InitCode()
+    {
+        Console.WriteLine("Welcome to ThoamAuth \n Please Enter a secure server password");
+
+        string ?CodeEntered;
+
+        do
+        {
+            Console.WriteLine("Key must not be null or empty \n Should ideally have a length of 10+ Characters");
+            CodeEntered = Console.ReadLine();
+            
+        } while (string.IsNullOrEmpty(CodeEntered));
+
+        SecretCode = CreateSecretCode(CodeEntered);
+    }
     public static string[] CreateSecretCode(string NewPass)
     {
         if (string.IsNullOrEmpty(NewPass))
         {
-            string ?Default = Environment.GetEnvironmentVariable("DEFAULT_SECRET_CODE");
+            string? Default = Environment.GetEnvironmentVariable("DEFAULT_SECRET_CODE");
 
-            return EncryptionHelperClass.GenNewHash(Default);    
+            return EncryptionHelperClass.GenNewHash(Default);
         }
         return EncryptionHelperClass.GenNewHash(NewPass);
     }

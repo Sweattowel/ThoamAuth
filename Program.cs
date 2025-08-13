@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using ThoamAuth.ServerPoliciesAndSettings.Roles;
 using ThoamAuth.ServerPoliciesAndSettings.MiddleWare;
+using ThoamAuth.Helpers.AdminHelper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Cookies;
+
+AdminHelperClass.InitCode();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,8 +46,6 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddSingleton<IAuthorizationHandler, RoleClass.NotRoleHandler>();
 
-builder.Services.AddAuthentication();
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -61,6 +62,7 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers(); 
+app.MapControllers();
+
 
 app.Run();

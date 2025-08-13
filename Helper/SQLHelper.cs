@@ -69,8 +69,7 @@ public class SQLHelperClass
                 LastLoginData = LastLoginData,
                 LoginCount = LoginCount,
             };
-        }
-        ;
+        };
 
         return null;
     }

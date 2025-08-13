@@ -20,7 +20,7 @@ public class EncryptionHelperClass
     {
         var SaltBytes = Encoding.UTF8.GetBytes(Salt);
 
-        using var pbkdf2 = new Rfc2898DeriveBytes(toEncrypt, SaltBytes, 100_000, HashAlgorithmName.SHA3_256);
+        using var pbkdf2 = new Rfc2898DeriveBytes(toEncrypt, SaltBytes, 100_000, HashAlgorithmName.SHA256);
 
         var hash = pbkdf2.GetBytes(32);
 

@@ -42,7 +42,7 @@ public class RequestMiddleware
 
         var tracker = TempIpRequests.GetOrAdd(ip, _ => new RequestTracker
         {
-            FirstRequestTime = DateTime.Now,
+            FirstRequestTime = DateTime.UtcNow,
             Count = 0
         });
 
