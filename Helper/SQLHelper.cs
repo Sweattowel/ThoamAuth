@@ -58,7 +58,7 @@ public class SQLHelperClass
         DateTime LastLoginData = reader.GetDateTime(reader.GetOrdinal("LastLoginData"));
         int LoginCount = reader.GetInt32(reader.GetOrdinal("LoginCount"));
 
-        if (EncryptionHelperClass.Verify(PassWordAttempt, StoredAccountHash, StoredAccountSalt))
+        if (EncryptionVerifyCodeAndGen.Verify(PassWordAttempt, StoredAccountHash, StoredAccountSalt))
         {
             return new UserModelClass.User()
             {
@@ -95,7 +95,7 @@ public class SQLHelperClass
         }
 
 
-        string[] PassAndSalt = EncryptionHelperClass.GenNewHash(PassWordAttempt);
+        string[] PassAndSalt = EncryptionVerifyCodeAndGen.GenNewHash(PassWordAttempt);
 
         await using (var commandEnter = new SqlCommand(SQLqueryEnter, connection))
         {
@@ -204,7 +204,7 @@ public class SQLHelperClass
 
         await connection.CloseAsync();
 
-        bool VerifiedPassword = Encryption.EncryptionHelperClass.Verify(adminFormData.PasswordAttempt, UserPassword, UserSalt);
+        bool VerifiedPassword = Encryption.EncryptionVerifyCodeAndGen.Verify(adminFormData.PasswordAttempt, UserPassword, UserSalt);
 
         if (!VerifiedPassword) { return null; };
 

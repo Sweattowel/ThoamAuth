@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using ThoamAuth.Helpers.SQL;
 using ThoamAuth.Helpers.Logs;
+using System.Text;
 
 namespace ThoamAuth.ServerPoliciesAndSettings.MiddleWare;
 

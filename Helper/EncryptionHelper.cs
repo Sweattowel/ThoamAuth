@@ -1,9 +1,10 @@
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace ThoamAuth.Helpers.Encryption;
 
-public class EncryptionHelperClass
+public class EncryptionVerifyCodeAndGen
 {
     public static string[] GenNewHash(string HashAttempt)
     {

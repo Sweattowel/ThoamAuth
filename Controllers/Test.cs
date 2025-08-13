@@ -3,6 +3,7 @@ using ThoamAuth.Helpers.WebSockets;
 using ThoamAuth.Helpers.Logs;
 using Microsoft.AspNetCore.Mvc;
 using ThoamAuth.Models.Logs;
+using ThoamAuth.Helpers.AdminHelper;
 
 namespace ThoamAuth.Controllers.Testing;
 
@@ -43,5 +44,10 @@ public class Testing : ControllerBase
     public Logs[] GetLogs()
     {
         return [.. LogHelperClass.LogList];
+    }
+    [HttpGet("VerifyCodeWorks")]
+    public IActionResult VerifyAdminCode([FromQuery] string CodeAttempt)
+    {
+        return AdminHelperClass.VerifySecretCode(CodeAttempt) ? Ok() : Unauthorized();
     }
 }

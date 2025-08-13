@@ -17,7 +17,7 @@ public class AdminHelperClass
         {
             Console.WriteLine("Key must not be null or empty \n Should ideally have a length of 10+ Characters");
             CodeEntered = Console.ReadLine();
-            
+
         } while (string.IsNullOrEmpty(CodeEntered));
 
         SecretCode = CreateSecretCode(CodeEntered);
@@ -28,14 +28,14 @@ public class AdminHelperClass
         {
             string? Default = Environment.GetEnvironmentVariable("DEFAULT_SECRET_CODE");
 
-            return EncryptionHelperClass.GenNewHash(Default);
+            return EncryptionVerifyCodeAndGen.GenNewHash(Default);
         }
-        return EncryptionHelperClass.GenNewHash(NewPass);
+        return EncryptionVerifyCodeAndGen.GenNewHash(NewPass);
     }
     public static bool VerifySecretCode(string SecretCodeAttempt)
     {
         if (SecretCode[0] == "" || SecretCode[1] == "") { return false; }
 
-        return EncryptionHelperClass.Verify(SecretCodeAttempt, SecretCode[1], SecretCode[0]);
+        return EncryptionVerifyCodeAndGen.Verify(SecretCodeAttempt, SecretCode[1], SecretCode[0]);
     }
 }
