@@ -69,6 +69,18 @@ public class RequestMiddleware
             return; 
         }
 
+        // TODO Potentially add sanitization to all requests instead of manually adding everywhere? 
+        /*
+            Pros:
+                Expansive
+                consistant
+                Human error is removed from new queries
+                Easy Maintenance
+            Cons:
+                Not customisable for instances
+                if one area is broken all areas are broken
+        */
+
         await _next(context);
     }
 

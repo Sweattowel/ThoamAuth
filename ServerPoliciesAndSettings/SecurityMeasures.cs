@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.RegularExpressions;
+
 namespace ThoamAuth.ServerPoliciesAndSettings.SecurityMeasures;
 
 public class SecurityMeasures
@@ -12,6 +15,7 @@ public class SecurityMeasures
         {"'","%27" },
         {"=","%3D" },
         {"`","%60" },
+        {"*","%2A" },
     };
     private static readonly Dictionary<string, string> IllegalsWords = new()
     {
@@ -20,37 +24,35 @@ public class SecurityMeasures
         {"UPDATE","ERRORWORD3" },
         {"DELETE","ERRORWORD4" },
         {"SCRIPT","ERRORWORD5" },
-    };    
+        {"TABLE","ERRORWORD6" },
+    };
     public static string EscapeString(string ToEscape)
     {
-        string[] Words = ToEscape.Split(" ");
+        var sb = new StringBuilder(ToEscape.Length);
 
-        for (int i = 0; i < Words.Length; i++)
+        foreach (char c in ToEscape)
         {
-            string word = Words[i];
-            
-            if (IllegalsWords.TryGetValue(word.ToUpperInvariant(), out string? replacementWord))
-            {
-                Words[i] = replacementWord;
+            string s = c.ToString();
 
-                continue;
-            }
-            
-            string[] Chars = Words[i].Split("");
+            if (IllegalsChars.TryGetValue(s, out string? value))
+                sb.Append(value);
+            else
+                sb.Append(c);
+        }
 
-            for (int j = 0; j < Chars.Length; j++)
-            {
-                if (IllegalsChars.TryGetValue(Chars[j], out string? replacementChar))
-                {
-                    Chars[j] = replacementChar;
+        string charReplaced = sb.ToString();
 
-                    continue;
-                }
-            }
-            Words[i] = string.Join("", Chars);
-        };
+        string pattern = String.Join("|", IllegalsWords.Keys);
+        Regex regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        return String.Join(" ", Words);
+        string result = regex.Replace(charReplaced, match =>
+        {
+            string key = match.Value.ToUpper();
+
+            return IllegalsWords.ContainsKey(key) ? IllegalsWords[key] : match.Value;
+        });
+
+        return result;
     }
     public static void Test(string Illegal)
     {
