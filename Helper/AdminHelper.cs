@@ -22,19 +22,22 @@ public class AdminHelperClass
 
         SecretCode = CreateSecretCode(CodeEntered);
     }
-    public static string[] CreateSecretCode(string NewPass)
+    public static string[]? CreateSecretCode(string NewPass)
     {
         if (string.IsNullOrEmpty(NewPass))
         {
             string? Default = Environment.GetEnvironmentVariable("DEFAULT_SECRET_CODE");
-
+            if (Default == null)
+            {
+                InitCode();
+            }
             return EncryptionVerifyCodeAndGen.GenNewHash(Default);
         }
         return EncryptionVerifyCodeAndGen.GenNewHash(NewPass);
     }
     public static bool VerifySecretCode(string SecretCodeAttempt)
     {
-        if (SecretCode[0] == "" || SecretCode[1] == "") { return false; }
+        if (string.IsNullOrEmpty(SecretCode[0]) || string.IsNullOrEmpty(SecretCode[1])) { return false; }
 
         return EncryptionVerifyCodeAndGen.Verify(SecretCodeAttempt, SecretCode[1], SecretCode[0]);
     }

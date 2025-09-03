@@ -50,4 +50,11 @@ public class Testing : ControllerBase
     {
         return AdminHelperClass.VerifySecretCode(CodeAttempt) ? Ok() : Unauthorized();
     }
+    [HttpGet("TestSecurityMeasure")]
+    public IActionResult TestingSecurity([FromQuery] string IllegalActivity)
+    {
+        ThoamAuth.ServerPoliciesAndSettings.SecurityMeasures.SecurityMeasures.Test(IllegalActivity);
+
+        return Ok();
+    }
 }
