@@ -56,6 +56,8 @@ app.UseSwaggerUI();
 
 app.UseMiddleware<RequestMiddleware>();
 
+app.UseMiddleware<ResponseMiddleware>();
+
 app.UseWebSockets();
 
 app.UseAuthentication();

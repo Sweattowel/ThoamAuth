@@ -61,12 +61,12 @@ public class RequestMiddleware
         if (tracker.Count > RequestLimit)
         {
             context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-            
+
             await context.Response.WriteAsync("Too many requests - try again later.");
 
-            LogHelperClass.GenerateLog($"Too many requests from ip: {ip}", Models.Logs.LogStateEnum.Warning, Models.Logs.LogImportance.Medium );
+            LogHelperClass.GenerateLog($"Too many requests from ip: {ip}", Models.Logs.LogStateEnum.Warning, Models.Logs.LogImportance.Medium);
 
-            return; 
+            return;
         }
 
         // TODO Potentially add sanitization to all requests instead of manually adding everywhere? 
@@ -88,5 +88,21 @@ public class RequestMiddleware
     {
         public DateTime FirstRequestTime { get; set; }
         public int Count { get; set; }
+    }
+}
+public class ResponseMiddleware
+{
+    private static readonly Dictionary<string, HashSet<string>> WhiteList = new()
+    {
+        ["Test"] = new HashSet<string> { "Goon" },
+    };
+    private readonly RequestDelegate _Next;
+    public ResponseMiddleware(RequestDelegate Next)
+    {
+        _Next = Next;
+    }
+    public async Task Invoke(HttpContext context)
+    {
+        await _Next(context);
     }
 }

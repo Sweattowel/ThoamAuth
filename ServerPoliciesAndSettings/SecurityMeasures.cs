@@ -5,9 +5,10 @@ namespace ThoamAuth.ServerPoliciesAndSettings.SecurityMeasures;
 
 public class SecurityMeasures
 {
-    private static readonly Dictionary<string, string> IllegalsChars = new()
+    private static readonly Dictionary<string, string> Illegals = new()
     {
-        {"\\","%5C" },
+        // Chars
+        { "\\","%5C" },
         {"-","%2D" },
         {"/","%2F" },
         {"!","%21" },
@@ -16,10 +17,8 @@ public class SecurityMeasures
         {"=","%3D" },
         {"`","%60" },
         {"*","%2A" },
-    };
-    private static readonly Dictionary<string, string> IllegalsWords = new()
-    {
-        {"SELECT","ERRORWORD1" },
+        // Words
+        { "SELECT","ERRORWORD1" },
         {"UNION","ERRORWORD2" },
         {"UPDATE","ERRORWORD3" },
         {"DELETE","ERRORWORD4" },
@@ -28,31 +27,19 @@ public class SecurityMeasures
     };
     public static string EscapeString(string ToEscape)
     {
-        var sb = new StringBuilder(ToEscape.Length);
 
-        foreach (char c in ToEscape)
-        {
-            string s = c.ToString();
-
-            if (IllegalsChars.TryGetValue(s, out string? value))
-                sb.Append(value);
-            else
-                sb.Append(c);
-        }
-
-        string charReplaced = sb.ToString();
-
-        string pattern = String.Join("|", IllegalsWords.Keys);
+        string pattern = String.Join("|", Illegals.Keys);
         Regex regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        string result = regex.Replace(charReplaced, match =>
+        string result = regex.Replace(ToEscape, match =>
         {
             string key = match.Value.ToUpper();
 
-            return IllegalsWords.ContainsKey(key) ? IllegalsWords[key] : match.Value;
+            return Illegals.ContainsKey(key) ? Illegals[key] : match.Value;
         });
 
         return result;
+        
     }
     public static void Test(string Illegal)
     {
