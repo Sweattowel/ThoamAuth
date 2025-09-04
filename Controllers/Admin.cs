@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using ThoamAuth.Models.User;
+using ThoamAuth.Models.Logs;
 using ThoamAuth.Helpers.WebSockets;
 using ThoamAuth.Helpers.Notifications;
 using ThoamAuth.Helpers.AdminHelper;
@@ -20,17 +21,19 @@ public class AdminRoutes : ControllerBase
     {
         bool CodeSuccess = AdminHelperClass.VerifySecretCode(adminFormData.SecretCode);
 
-        if (!CodeSuccess) { return Unauthorized(); };
+        if (!CodeSuccess) { return Unauthorized(); }
+        ;
 
-        UserModelClass.User ?LoginSuccess = await SQLHelperClass.SQLAdminLogin(adminFormData );
+        UserModelClass.User? LoginSuccess = await SQLHelperClass.SQLAdminLogin(adminFormData);
 
-        if (LoginSuccess == null) { return Unauthorized(); };
+        if (LoginSuccess == null) { return Unauthorized(); }
+        ;
 
         bool SignInSuccess = await ServerPoliciesAndSettings.Authorization.AuthorizationHelperClass.SignAdminIn(HttpContext, LoginSuccess);
 
         return SignInSuccess ? Ok() : Unauthorized();
     }
-    
+
     [HttpPost("AdminLogout")]
     [HttpPost("AdjustUserState")]
     [Authorize(Roles = "Admin")]
@@ -65,5 +68,12 @@ public class AdminRoutes : ControllerBase
         }
 
         return Count;
+    }
+    //[Authorize(Roles = "Admin")]
+    [HttpGet("GetLogs")]
+    public async Task<Models.Logs.Logs[]> MessageActiveUsers([FromQuery] LogFilterData LogFilter,[FromQuery] Models.Logs.LogStateEnum ?WantedState,[FromQuery] Models.Logs.LogImportance ?WantedLevel)
+    {
+  
+        return ThoamAuth.Helpers.Logs.LogHelperClass.GetLogs(LogFilter, WantedState, WantedLevel);
     }
 }

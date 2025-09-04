@@ -13,7 +13,7 @@ public class RequestMiddleware
     private static readonly ConcurrentDictionary<string, RequestTracker> TempIpRequests = new();
 
     private const int RequestLimit = 10;
-    private static readonly TimeSpan Window = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan Window = TimeSpan.FromMinutes(0.25);
 
     public RequestMiddleware(RequestDelegate next)
     {

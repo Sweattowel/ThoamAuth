@@ -28,7 +28,7 @@ public class SQLHelperClass
 
         return builder.ConnectionString;
     }
-    public static SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder(GetConnectionString());
+    private static SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder(GetConnectionString());
 
     public static async Task<UserModelClass.User?> SQLLoginCheck(string UserNameAttempt, string PassWordAttempt)
     {
